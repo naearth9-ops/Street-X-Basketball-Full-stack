@@ -27,3 +27,4 @@ const handleSubmit = async (e) => {
     setError(err.message);
   }
 };
+export default Register;
