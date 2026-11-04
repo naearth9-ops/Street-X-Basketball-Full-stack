@@ -5,15 +5,24 @@ export default function ProductList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //ดึงสินค้าทั้งหมด
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://street-x-basketball-full-stack.onrender.com";
+
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE_URL}/api/products`);
       if (!res.ok) throw new Error("Network response was not ok");
       const data = await res.json();
-      setProducts(data);
+
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        setProducts([]);
+      }
     } catch (err) {
       console.error("Error fetching products:", err);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -23,14 +32,13 @@ export default function ProductList() {
     fetchProducts();
   }, []);
 
-  // ฟังก์ชันลบสินค้า
-  const handleDelete = async (id) => {
-    const isConfirmed = window.confirm("คุณต้องการลบสินค้านี้ใช่หรือไม่?");
+  const handleDelete = async (id, name) => {
+    const isConfirmed = window.confirm(`คุณต้องการลบสินค้า "${name || 'นี้'}" ใช่หรือไม่?`);
     if (!isConfirmed) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +51,7 @@ export default function ProductList() {
         throw new Error(
           data.message ||
             data.error ||
-            "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ในการลบสินค้า",
+            "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ในการลบสินค้า"
         );
       }
 
@@ -83,43 +91,62 @@ export default function ProductList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-800 text-sm">
-            {products.map((item) => (
-              <tr key={item.id} className="hover:bg-neutral-800/50">
-                <td className="p-4">
-                  <img
-                    src={
-                      item.image_url
-                        ? `http://localhost:5000${item.image_url}`
-                        : "https://via.placeholder.com/60"
-                    }
-                    alt={item.name}
-                    className="w-12 h-12 object-cover rounded border border-neutral-700"
-                  />
-                </td>
-                <td className="p-4 font-semibold text-white">{item.name}</td>
-                <td className="p-4 text-neutral-400">
-                  {item.category_name || "-"}
-                </td>
-                <td className="p-4 text-orange-400 font-bold">
-                  ฿{Number(item.price).toLocaleString()}
-                </td>
-                <td className="p-4">{item.stock} ชิ้น</td>
-                <td className="p-4 text-center space-x-2">
-                  <Link
-                    to={`/admin/products/edit/${item.id}`}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold"
-                  >
-                    แก้ไข
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(item.id, item.name)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-semibold"
-                  >
-                    ลบ
-                  </button>
+            {!Array.isArray(products) || products.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="p-8 text-center text-neutral-500">
+                  ยังไม่มีรายการสินค้าในระบบ
                 </td>
               </tr>
-            ))}
+            ) : (
+              products.map((item) => (
+                <tr key={item.id} className="hover:bg-neutral-800/50">
+                  <td className="p-4">
+                    <img
+                      src={(() => {
+                        if (!item.image_url) return "https://via.placeholder.com/60";
+                        if (
+                          item.image_url.startsWith("http://") ||
+                          item.image_url.startsWith("https://")
+                        ) {
+                          return item.image_url;
+                        }
+                        if (item.image_url.startsWith("/uploads/")) {
+                          return `${API_BASE_URL}${item.image_url}`;
+                        }
+                        return `${API_BASE_URL}/uploads/${item.image_url}`;
+                      })()}
+                      alt={item.name}
+                      className="w-12 h-12 object-cover rounded border border-neutral-700"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/60";
+                      }}
+                    />
+                  </td>
+                  <td className="p-4 font-semibold text-white">{item.name}</td>
+                  <td className="p-4 text-neutral-400">
+                    {item.category_name || "-"}
+                  </td>
+                  <td className="p-4 text-orange-400 font-bold">
+                    ฿{Number(item.price).toLocaleString()}
+                  </td>
+                  <td className="p-4">{item.stock ?? 0} ชิ้น</td>
+                  <td className="p-4 text-center space-x-2">
+                    <Link
+                      to={`/admin/products/edit/${item.id}`}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold"
+                    >
+                      แก้ไข
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(item.id, item.name)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-semibold cursor-pointer"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

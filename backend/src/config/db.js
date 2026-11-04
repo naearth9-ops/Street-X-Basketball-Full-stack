@@ -37,4 +37,18 @@ db.query(
   .then(() => console.log("Table 'users' is ready!"))
   .catch((err) => console.error("Error creating users table:", err.message));
 
+db.query(`
+  CREATE TABLE IF NOT EXISTS products (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      price DECIMAL(10, 2) NOT NULL,
+      image VARCHAR(255),
+      category VARCHAR(100),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`)
+.then(() => console.log("Table 'products' is ready!"))
+.catch((err) => console.error("Error creating products table:", err.message));
+
 module.exports = db;

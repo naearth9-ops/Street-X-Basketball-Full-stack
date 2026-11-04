@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function ProductCreate() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [imageFile, setImageFile] = useState(null); 
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     category_id: "",
@@ -13,12 +13,25 @@ export default function ProductCreate() {
     description: "",
   });
 
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://street-x-basketball-full-stack.onrender.com";
+
   useEffect(() => {
-    fetch("http://localhost:5000/api/categories")
+    fetch(`${API_BASE_URL}/api/categories`)
       .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch((err) => console.error(err));
-  }, []);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          setCategories([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
+        setCategories([]);
+      });
+  }, [API_BASE_URL]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,20 +60,24 @@ export default function ProductCreate() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch(`${API_BASE_URL}/api/products`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, //แนบ JWT
+          Authorization: `Bearer ${token}`, 
         },
-        body: data, 
+        body: data,
       });
 
-      if (!res.ok) throw new Error("Failed to create product");
+      const resData = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(resData.message || "Failed to create product");
+      }
 
       alert("เพิ่มสินค้าสำเร็จ!");
       navigate("/admin/products");
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเพิ่มสินค้า");
+      alert(err.message || "เกิดข้อผิดพลาดในการเพิ่มสินค้า");
     }
   };
 
@@ -101,11 +118,12 @@ export default function ProductCreate() {
               className="w-full bg-black border border-neutral-700 rounded p-2 text-white focus:outline-none focus:border-orange-500"
             >
               <option value="">-- เลือกหมวดหมู่ --</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {Array.isArray(categories) &&
+                categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -147,7 +165,7 @@ export default function ProductCreate() {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full bg-black border border-neutral-700 rounded p-1.5 text-white text-sm focus:outline-none focus:border-orange-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-black hover:file:bg-orange-600"
+              className="w-full bg-black border border-neutral-700 rounded p-1.5 text-white text-sm focus:outline-none focus:border-orange-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-black hover:file:bg-orange-600 cursor-pointer"
             />
           </div>
         </div>
@@ -169,13 +187,13 @@ export default function ProductCreate() {
           <button
             type="button"
             onClick={() => navigate("/admin/products")}
-            className="bg-neutral-700 hover:bg-neutral-600 text-white font-semibold px-4 py-2 rounded"
+            className="bg-neutral-700 hover:bg-neutral-600 text-white font-semibold px-4 py-2 rounded cursor-pointer"
           >
             ยกเลิก
           </button>
           <button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-4 py-2 rounded uppercase"
+            className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-4 py-2 rounded uppercase cursor-pointer"
           >
             บันทึกสินค้า
           </button>

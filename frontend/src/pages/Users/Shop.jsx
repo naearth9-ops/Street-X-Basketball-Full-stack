@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom"; // 👈 1. Import useSearchParams
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 export default function Shop() {
@@ -11,20 +11,33 @@ export default function Shop() {
   const [searchParams] = useSearchParams();
   const categoryId = searchParams.get("category");
 
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://street-x-basketball-full-stack.onrender.com";
+
   useEffect(() => {
     setLoading(true);
 
-    let url = "http://localhost:5000/api/products";
+    let url = `${API_BASE_URL}/api/products`;
     if (categoryId) {
       url += `?category_id=${categoryId}`;
     }
 
     fetch(url)
       .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setProducts([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching products:", err);
+        setProducts([]);
+      })
       .finally(() => setLoading(false));
-  }, [categoryId]); 
+  }, [categoryId, API_BASE_URL]);
 
   const handleBuyNow = (item) => {
     addToCart(item);
@@ -63,13 +76,13 @@ export default function Shop() {
             to="/checkout"
             className="bg-orange-500 hover:bg-orange-600 text-black px-4 py-2 rounded-full font-black text-sm uppercase transition-colors"
           >
-             ชำระเงิน
+            ชำระเงิน
           </Link>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.length === 0 ? (
+        {!Array.isArray(products) || products.length === 0 ? (
           <div className="col-span-full text-center text-neutral-500 py-12">
             ไม่พบสินค้าในหมวดหมู่นี้
           </div>
@@ -94,9 +107,9 @@ export default function Shop() {
                       }
 
                       if (item.image_url.startsWith("/uploads/")) {
-                        return `http://localhost:5000${item.image_url}`;
+                        return `${API_BASE_URL}${item.image_url}`;
                       }
-                      return `http://localhost:5000/uploads/${item.image_url}`;
+                      return `${API_BASE_URL}/uploads/${item.image_url}`;
                     })()}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -122,16 +135,16 @@ export default function Shop() {
               <div className="p-4 pt-0 space-y-2">
                 <button
                   onClick={() => addToCart(item)}
-                  className="w-full bg-neutral-800 hover:bg-neutral-700 text-orange-400 font-bold py-2 rounded uppercase text-sm border border-orange-500/30 transition-colors"
+                  className="w-full bg-neutral-800 hover:bg-neutral-700 text-orange-400 font-bold py-2 rounded uppercase text-sm border border-orange-500/30 transition-colors cursor-pointer"
                 >
-                   เพิ่มลงตะกร้า
+                  เพิ่มลงตะกร้า
                 </button>
 
                 <button
                   onClick={() => handleBuyNow(item)}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-black font-black py-2 rounded uppercase text-sm transition-colors"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-black font-black py-2 rounded uppercase text-sm transition-colors cursor-pointer"
                 >
-                   ซื้อทันที
+                  ซื้อทันที
                 </button>
               </div>
             </div>
