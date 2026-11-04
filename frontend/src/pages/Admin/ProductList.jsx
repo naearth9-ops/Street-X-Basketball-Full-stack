@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -8,12 +8,12 @@ export default function ProductList() {
   //ดึงสินค้าทั้งหมด
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
-      if (!res.ok) throw new Error('Network response was not ok');
+      const res = await fetch("http://localhost:5000/api/products");
+      if (!res.ok) throw new Error("Network response was not ok");
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      console.error('Error fetching products:', err);
+      console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
     }
@@ -24,24 +24,33 @@ export default function ProductList() {
   }, []);
 
   // ฟังก์ชันลบสินค้า
-  const handleDelete = async (id, name) => {
-    if (window.confirm(`คุณต้องการลบสินค้า "${name}" ใช่หรือไม่?`)) {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}` 
-          }
-        });
+  const handleDelete = async (id) => {
+    const isConfirmed = window.confirm("คุณต้องการลบสินค้านี้ใช่หรือไม่?");
+    if (!isConfirmed) return;
 
-        if (!res.ok) throw new Error('Failed to delete product');
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        setProducts(products.filter((item) => item.id !== id));
-        alert(`ลบสินค้า "${name}" เรียบร้อยแล้ว`);
-      } catch (err) {
-        alert('เกิดข้อผิดพลาดในการลบสินค้า (ตรวจสอบสิทธิ์การใช้งาน)');
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message ||
+            data.error ||
+            "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ในการลบสินค้า",
+        );
       }
+
+      alert("ลบสินค้าเรียบร้อยแล้ว!");
+      setProducts(products.filter((product) => product.id !== id));
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -78,14 +87,22 @@ export default function ProductList() {
               <tr key={item.id} className="hover:bg-neutral-800/50">
                 <td className="p-4">
                   <img
-                    src={item.image_url ? `http://localhost:5000${item.image_url}` : 'https://via.placeholder.com/60'}
+                    src={
+                      item.image_url
+                        ? `http://localhost:5000${item.image_url}`
+                        : "https://via.placeholder.com/60"
+                    }
                     alt={item.name}
                     className="w-12 h-12 object-cover rounded border border-neutral-700"
                   />
                 </td>
                 <td className="p-4 font-semibold text-white">{item.name}</td>
-                <td className="p-4 text-neutral-400">{item.category_name || '-'}</td>
-                <td className="p-4 text-orange-400 font-bold">฿{Number(item.price).toLocaleString()}</td>
+                <td className="p-4 text-neutral-400">
+                  {item.category_name || "-"}
+                </td>
+                <td className="p-4 text-orange-400 font-bold">
+                  ฿{Number(item.price).toLocaleString()}
+                </td>
                 <td className="p-4">{item.stock} ชิ้น</td>
                 <td className="p-4 text-center space-x-2">
                   <Link

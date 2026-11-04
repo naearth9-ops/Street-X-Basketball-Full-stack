@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export default function ProductEdit() {
-  const { id } = useParams(); // รับ ID จาก URL 
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [imageFile, setImageFile] = useState(null); // 💡 State สำหรับไฟล์รูปภาพใหม่
+  const [imageFile, setImageFile] = useState(null); 
   const [formData, setFormData] = useState({
     name: '',
     category_id: '',
@@ -15,22 +15,22 @@ export default function ProductEdit() {
     image_url: '',
   });
   const [loading, setLoading] = useState(true);
-
-  // ดึงข้อมูลหมวดหมู่ และข้อมูลสินค้าเดิมที่ต้องการแก้ไข
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // ดึงหมวดหมู่ทั้งหมด
+        const token = localStorage.getItem('token');
         const resCat = await fetch('http://localhost:5000/api/categories');
         const dataCat = await resCat.json();
         setCategories(dataCat);
 
-        // ดึงข้อมูลสินค้าเดิมตาม ID
-        const resProduct = await fetch(`http://localhost:5000/api/products/${id}`);
+        const resProduct = await fetch(`http://localhost:5000/api/products/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (!resProduct.ok) throw new Error('Product not found');
         const dataProduct = await resProduct.json();
         
-        // เติมข้อมูลเดิมลงใน State ฟอร์ม
         setFormData({
           name: dataProduct.name || '',
           category_id: dataProduct.category_id || '',
@@ -63,7 +63,6 @@ export default function ProductEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 💡 เปลี่ยนใช้ FormData รองรับการส่งไฟล์
     const data = new FormData();
     data.append('name', formData.name);
     data.append('category_id', formData.category_id);
@@ -71,23 +70,27 @@ export default function ProductEdit() {
     data.append('stock', formData.stock);
     data.append('description', formData.description);
 
-
     if (imageFile) {
       data.append('image', imageFile);
     }
 
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: data,
       });
 
-      if (!res.ok) throw new Error('Failed to update product');
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.message || 'Failed to update product');
 
       alert('อัปเดตข้อมูลสินค้าสำเร็จ!');
       navigate('/admin/products');
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการอัปเดตสินค้า');
+      alert(err.message || 'เกิดข้อผิดพลาดในการอัปเดตสินค้า');
     }
   };
 

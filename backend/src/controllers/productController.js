@@ -1,9 +1,9 @@
-//เรียกใช้ตัวแปรของservice
 const productService = require('../services/productService');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await productService.getAll();
+    const { category_id } = req.query;
+    const products = await productService.getAll(category_id);
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -57,8 +57,8 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     await productService.remove(req.params.id);
-    res.json({ message: 'Product deleted success.' });
+    res.json({ message: 'ลบสินค้าเรียบร้อยแล้ว' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ message: err.message });
   }
 };

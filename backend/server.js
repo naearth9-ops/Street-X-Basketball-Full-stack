@@ -6,6 +6,8 @@ require('dotenv').config();
 const productRoutes = require('./src/routes/products');
 const categoryRoutes = require('./src/routes/categories');
 const orderRoutes = require('./src/routes/orders');
+const authRoutes = require('./src/routes/auth'); 
+
 const app = express();
 
 const PORT = process.env.PORT || 5000; 
@@ -17,9 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes); 
 
 app.get('/', (req, res) => {
   res.send('Backend Server is Running...');

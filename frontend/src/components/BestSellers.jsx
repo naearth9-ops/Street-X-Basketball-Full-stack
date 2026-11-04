@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const products = [
   {
     id: 1,
+    categoryId: 2, 
     name: "UA Curry 11",
     category: "Basketball Shoes",
     price: "฿6,990",
@@ -11,6 +13,7 @@ const products = [
   },
   {
     id: 2,
+    categoryId: 2, 
     name: "Li-Ning Way of Wade 11",
     category: "Basketball Shoes",
     price: "฿4,640",
@@ -19,6 +22,7 @@ const products = [
   },
   {
     id: 3,
+    categoryId: 3, 
     name: "2024 All-Star Street Jersey",
     category: "Apparel",
     price: "฿1,290",
@@ -27,6 +31,7 @@ const products = [
   },
   {
     id: 4,
+    categoryId: 1, 
     name: "Street X Official Game Ball",
     category: "Equipment",
     price: "฿1,590",
@@ -36,6 +41,15 @@ const products = [
 ];
 
 export default function BestSellers() {
+  const navigate = useNavigate();
+  const handleViewAll = () => {
+    navigate('/shop');
+  };
+
+  const handleCardClick = (categoryId) => {
+    navigate(`/shop?category=${categoryId}`);
+  };
+
   return (
     <section id="bestsellers" className="py-20 bg-neutral-950 text-white px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -49,19 +63,21 @@ export default function BestSellers() {
               BEST <span className="text-orange-500">SELLERS</span>
             </h2>
           </div>
-          <button className="mt-4 md:mt-0 text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors uppercase tracking-wider flex items-center gap-1">
+          <button 
+            onClick={handleViewAll}
+            className="mt-4 md:mt-0 text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+          >
             VIEW ALL PRODUCTS &rarr;
           </button>
         </div>
 
-        {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((item) => (
             <div
               key={item.id}
-              className="group bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-orange-500/50 transition-all duration-300"
+              onClick={() => handleCardClick(item.categoryId)}
+              className="group bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-orange-500/50 transition-all duration-300 cursor-pointer"
             >
-              {/* Product Image Container */}
               <div className="relative aspect-square overflow-hidden bg-neutral-950">
                 <img
                   src={item.image}
@@ -88,7 +104,13 @@ export default function BestSellers() {
                   <span className="text-xl font-black text-yellow-400 font-mono">
                     {item.price}
                   </span>
-                  <button className="bg-neutral-800 hover:bg-orange-500 hover:text-black text-white p-2.5 rounded-xl transition-all">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation(); 
+                      handleCardClick(item.categoryId);
+                    }}
+                    className="bg-neutral-800 hover:bg-orange-500 hover:text-black text-white p-2.5 rounded-xl transition-all"
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>

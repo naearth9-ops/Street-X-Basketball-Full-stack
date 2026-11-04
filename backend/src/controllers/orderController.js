@@ -49,7 +49,33 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: "กรุณาระบุสถานะที่ต้องการเปลี่ยน" });
+  }
+
+  try {
+    const [result] = await db.query(
+      "UPDATE orders SET status = ? WHERE id = ?",
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "ไม่พบรายการสั่งซื้อที่ต้องการอัปเดต" });
+    }
+
+    res.json({ message: "อัปเดตสถานะคำสั่งซื้อเรียบร้อยแล้ว" });
+  } catch (err) {
+    console.error("UPDATE ORDER STATUS ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
+  updateOrderStatus, 
 };

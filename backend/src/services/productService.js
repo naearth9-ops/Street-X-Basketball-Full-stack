@@ -1,8 +1,10 @@
 const db = require('../config/db');
+const fs = require('fs');
+const path = require('path');
 
 // ดึงสินค้าทั้งหมด
-const getAll = async () => {
-  const query = `
+const getAll = async (categoryId) => {
+  let query = `
     SELECT 
       p.id,
       p.name,
@@ -15,12 +17,17 @@ const getAll = async () => {
       c.name AS category_name
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
-    ORDER BY p.id DESC
   `;
-  const [products] = await db.query(query);
+  const queryParams = [];
+  if (categoryId) {
+    query += ` WHERE p.category_id = ?`;
+    queryParams.push(categoryId);
+  }
+  query += ` ORDER BY p.id DESC`;
+
+  const [products] = await db.query(query, queryParams);
   return products;
 };
-
 // ดึงสินค้าตาม ID
 const getById = async (id) => {
   const [products] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
@@ -49,7 +56,33 @@ const update = async (id, productData) => {
 
 // ลบสินค้า
 const remove = async (id) => {
-  await db.query('DELETE FROM products WHERE id = ?', [id]);
+  const [products] = await db.query('SELECT image_url FROM products WHERE id = ?', [id]);
+  
+  if (products.length === 0) {
+    throw new Error('ไม่พบสินค้าที่ต้องการลบ');
+  }
+
+  const imageUrl = products[0].image_url;
+
+  try {
+    await db.query('DELETE FROM products WHERE id = ?', [id]);
+  } catch (err) {
+    if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.errno === 1451) {
+      throw new Error('ไม่สามารถลบได้ เนื่องจากสินค้านี้มีประวัติสั่งซื้ออยู่ในระบบ');
+    }
+    throw err;
+  }
+
+  if (imageUrl) {
+  try {
+    const filePath = path.join(__dirname, '../../public', imageUrl); 
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (fileErr) {
+    console.error("ไม่สามารถลบไฟล์รูปภาพได้:", fileErr.message);
+  }
+}
 };
 
 
