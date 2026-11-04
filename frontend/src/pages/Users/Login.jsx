@@ -8,12 +8,16 @@ export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://street-x-basketball-full-stack.onrender.com";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -22,6 +26,7 @@ export default function Login() {
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+
       login(data.user, data.token);
       alert(`เข้าสู่ระบบสำเร็จ! ยินดีต้อนรับคุณ ${data.user.username}`);
 
