@@ -18,7 +18,7 @@ import ServicesPage from "./pages/Users/ServicesPage";
 import ContactPage from "./pages/Users/ContactPage";
 import AboutPage from "./pages/Users/AboutPage";
 import Login from "./pages/Users/Login"; 
-import { Register } from "./pages/Users/Register";
+import Register from "./pages/Users/Register";
 
 function App() {
   return (
