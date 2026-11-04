@@ -114,7 +114,7 @@ const HeroBanner = () => {
                   </p>
                 </div>
                 <span className="text-lg font-black text-yellow-400 font-mono">
-                  ฿6,990
+                  ฿3,990
                 </span>
               </div>
             </div>
