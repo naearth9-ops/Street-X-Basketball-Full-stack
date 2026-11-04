@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; 
+import { useAuth } from "../../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://street-x-basketball-full-stack.onrender.com";
 
-function Register() {
+export default function Register() {
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ function Register() {
 
       login(data.user, data.token);
 
-      if (data.user.role === "admin") {
+      if (data.user?.role === "admin") {
         navigate("/admin/products");
       } else {
         navigate("/");
@@ -40,7 +40,7 @@ function Register() {
 
   return (
     <div>
-      <h2>Register</h2>
+      <h2>สมัครสมาชิก</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <button type="submit">Register</button>
@@ -48,5 +48,3 @@ function Register() {
     </div>
   );
 }
-
-export default Register;
