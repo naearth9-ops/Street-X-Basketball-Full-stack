@@ -4,24 +4,29 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
         console.error("Failed to parse user", e);
+        localStorage.removeItem('user'); 
       }
+    } else {
+      localStorage.removeItem('user'); 
     }
-    setLoading(false); 
+    setLoading(false);
   }, []);
 
   const login = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+    if (userData && token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    }
   };
 
   const logout = () => {
@@ -36,7 +41,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => {
   return useContext(AuthContext);
