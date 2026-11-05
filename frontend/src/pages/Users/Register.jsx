@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,9 @@ export default function Register() {
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // ดึงฟังก์ชัน login จาก AuthContext
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,9 +29,10 @@ export default function Register() {
       if (!res.ok)
         throw new Error(data.message || "เกิดข้อผิดพลาดในการลงทะเบียน");
 
+      // บันทึกสถานะผู้ใช้งานเข้า Context และ localStorage
       login(data.user, data.token);
 
-      if (data.user.role === "admin") {
+      if (data.user?.role === "admin") {
         navigate("/admin/products");
       } else {
         navigate("/");
