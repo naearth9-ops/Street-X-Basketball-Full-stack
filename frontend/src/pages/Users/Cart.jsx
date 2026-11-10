@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Cart() {
-  const { cart, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart, totalPrice } =
+    useCart();
 
   if (cart.length === 0) {
     return (
@@ -24,7 +26,9 @@ export default function Cart() {
     <div className="bg-black min-h-screen text-white p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold uppercase text-orange-500">ตะกร้าสินค้าของคุณ</h1>
+          <h1 className="text-2xl font-bold uppercase text-orange-500">
+            ตะกร้าสินค้าของคุณ
+          </h1>
           <button
             onClick={clearCart}
             className="text-xs text-neutral-400 hover:text-red-400 underline"
@@ -43,10 +47,10 @@ export default function Cart() {
                 <img
                   src={
                     item.image_url
-                      ? item.image_url.startsWith('http')
+                      ? item.image_url.startsWith("http")
                         ? item.image_url
                         : `${API_BASE_URL}${item.image_url}`
-                      : 'https://via.placeholder.com/60'
+                      : "https://via.placeholder.com/60"
                   }
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded border border-neutral-700"
@@ -67,7 +71,9 @@ export default function Cart() {
                   >
                     -
                   </button>
-                  <span className="px-3 text-sm font-bold">{item.quantity}</span>
+                  <span className="px-3 text-sm font-bold">
+                    {item.quantity}
+                  </span>
                   <button
                     onClick={() => updateQuantity(item.id, 1)}
                     className="px-3 py-1 hover:bg-neutral-800 text-orange-500 font-bold"
@@ -100,12 +106,12 @@ export default function Cart() {
             >
               เลือกสินค้าเพิ่ม
             </Link>
-            <button
-              onClick={() => alert('เข้าสู่ขั้นตอนการชำระเงิน')}
-              className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 py-2 rounded uppercase"
+            <Link
+              to="/checkout"
+              className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 py-2 rounded uppercase inline-block text-center"
             >
               ชำระเงิน
-            </button>
+            </Link>
           </div>
         </div>
       </div>
