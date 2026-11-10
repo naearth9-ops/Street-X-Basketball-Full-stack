@@ -111,9 +111,8 @@ export default function Cart() {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                console.log("Checkout clicked!");
-                navigate("/checkout");
+                console.log("Checkout button clicked successfully!");
+                window.location.href = "/checkout";
               }}
               className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 py-2 rounded uppercase relative z-50 cursor-pointer"
             >
