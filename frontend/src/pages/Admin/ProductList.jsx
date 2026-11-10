@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function ProductList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //ดึงสินค้าทั้งหมด
+  // ดึงสินค้าทั้งหมด
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${API_BASE_URL}/api/products`);
       if (!res.ok) throw new Error("Network response was not ok");
       const data = await res.json();
       setProducts(data);
@@ -30,7 +32,7 @@ export default function ProductList() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -86,10 +88,13 @@ export default function ProductList() {
             {products.map((item) => (
               <tr key={item.id} className="hover:bg-neutral-800/50">
                 <td className="p-4">
+                  {/* จุดที่ 3: เติม API_BASE_URL ให้กับรูปภาพ */}
                   <img
                     src={
                       item.image_url
-                        ? `http://localhost:5000${item.image_url}`
+                        ? item.image_url.startsWith("http")
+                          ? item.image_url
+                          : `${API_BASE_URL}${item.image_url}`
                         : "https://via.placeholder.com/60"
                     }
                     alt={item.name}
@@ -112,7 +117,7 @@ export default function ProductList() {
                     แก้ไข
                   </Link>
                   <button
-                    onClick={() => handleDelete(item.id, item.name)}
+                    onClick={() => handleDelete(item.id)}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-semibold"
                   >
                     ลบ

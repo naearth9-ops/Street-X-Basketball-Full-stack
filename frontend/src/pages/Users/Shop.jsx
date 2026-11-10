@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom"; // 👈 1. Import useSearchParams
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
@@ -14,7 +16,7 @@ export default function Shop() {
   useEffect(() => {
     setLoading(true);
 
-    let url = "http://localhost:5000/api/products";
+    let url = `${API_BASE_URL}/api/products`;
     if (categoryId) {
       url += `?category_id=${categoryId}`;
     }
@@ -63,7 +65,7 @@ export default function Shop() {
             to="/checkout"
             className="bg-orange-500 hover:bg-orange-600 text-black px-4 py-2 rounded-full font-black text-sm uppercase transition-colors"
           >
-             ชำระเงิน
+            ชำระเงิน
           </Link>
         </div>
       </div>
@@ -92,11 +94,10 @@ export default function Shop() {
                       ) {
                         return item.image_url;
                       }
-
                       if (item.image_url.startsWith("/uploads/")) {
-                        return `http://localhost:5000${item.image_url}`;
+                        return `${API_BASE_URL}${item.image_url}`;
                       }
-                      return `http://localhost:5000/uploads/${item.image_url}`;
+                      return `${API_BASE_URL}/uploads/${item.image_url}`;
                     })()}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -124,14 +125,14 @@ export default function Shop() {
                   onClick={() => addToCart(item)}
                   className="w-full bg-neutral-800 hover:bg-neutral-700 text-orange-400 font-bold py-2 rounded uppercase text-sm border border-orange-500/30 transition-colors"
                 >
-                   เพิ่มลงตะกร้า
+                  เพิ่มลงตะกร้า
                 </button>
 
                 <button
                   onClick={() => handleBuyNow(item)}
                   className="w-full bg-orange-500 hover:bg-orange-600 text-black font-black py-2 rounded uppercase text-sm transition-colors"
                 >
-                   ซื้อทันที
+                  ซื้อทันที
                 </button>
               </div>
             </div>

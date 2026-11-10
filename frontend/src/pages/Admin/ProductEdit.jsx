@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 export default function ProductEdit() {
   const { id } = useParams(); 
   const navigate = useNavigate();
@@ -15,15 +17,16 @@ export default function ProductEdit() {
     image_url: '',
   });
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const resCat = await fetch('http://localhost:5000/api/categories');
+        const resCat = await fetch(`${API_BASE_URL}/api/categories`);
         const dataCat = await resCat.json();
         setCategories(dataCat);
 
-        const resProduct = await fetch(`http://localhost:5000/api/products/${id}`, {
+        const resProduct = await fetch(`${API_BASE_URL}/api/products/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -76,7 +79,7 @@ export default function ProductEdit() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -165,8 +168,13 @@ export default function ProductEdit() {
             {formData.image_url && (
               <div className="mb-2 flex items-center gap-2 text-xs text-neutral-400">
                 <span>รูปปัจจุบัน:</span>
+                {/* จุดที่ 4: เติม API_BASE_URL ให้กับรูปภาพ */}
                 <img
-                  src={`http://localhost:5000${formData.image_url}`}
+                  src={
+                    formData.image_url.startsWith('http')
+                      ? formData.image_url
+                      : `${API_BASE_URL}${formData.image_url}`
+                  }
                   alt="Current Product"
                   className="w-8 h-8 object-cover rounded border border-neutral-700"
                 />

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 export default function Cart() {
   const { cart, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
 
@@ -41,7 +43,9 @@ export default function Cart() {
                 <img
                   src={
                     item.image_url
-                      ? `http://localhost:5000${item.image_url}`
+                      ? item.image_url.startsWith('http')
+                        ? item.image_url
+                        : `${API_BASE_URL}${item.image_url}`
                       : 'https://via.placeholder.com/60'
                   }
                   alt={item.name}

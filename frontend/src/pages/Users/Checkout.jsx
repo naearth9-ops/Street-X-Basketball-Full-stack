@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext'; 
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 export default function Checkout() {
   const { cart, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ export default function Checkout() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,7 +46,10 @@ export default function Checkout() {
           {cart.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
               <span>{item.name} x {item.quantity}</span>
-              <span className="font-bold text-orange-400">฿{(item.price * item.quantity).toLocaleString()}</span>
+              {/* แก้ไขไวยากรณ์การคูณราคาและจำนวน */}
+              <span className="font-bold text-orange-400">
+                ฿{(Number(item.price) * item.quantity).toLocaleString()}
+              </span>
             </div>
           ))}
         </div>

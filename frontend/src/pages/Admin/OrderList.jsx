@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 
+// ประกาศ API_BASE_URL มารับค่าจาก Environment Variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/orders", {
+    // จุดที่ 1: เปลี่ยนมาใช้ dynamic URL
+    fetch(`${API_BASE_URL}/api/orders`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -20,7 +24,8 @@ export default function OrderList() {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      // จุดที่ 2: เปลี่ยนมาใช้ dynamic URL
+      const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

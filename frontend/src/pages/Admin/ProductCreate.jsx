@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function ProductCreate() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -14,7 +16,7 @@ export default function ProductCreate() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/categories")
+    fetch(`${API_BASE_URL}/api/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch((err) => console.error(err));
@@ -47,10 +49,10 @@ export default function ProductCreate() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch(`${API_BASE_URL}/api/products`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, //แนบ JWT
+          Authorization: `Bearer ${token}`, // แนบ JWT
         },
         body: data, 
       });
