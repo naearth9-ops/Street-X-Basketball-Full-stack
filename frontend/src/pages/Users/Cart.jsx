@@ -1,12 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Cart() {
-  const { cart, updateQuantity, removeFromCart, clearCart, totalPrice } =
-    useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
+  const navigate = useNavigate();
 
   if (cart.length === 0) {
     return (
@@ -106,12 +107,13 @@ export default function Cart() {
             >
               เลือกสินค้าเพิ่ม
             </Link>
-            <Link
-              to="/checkout"
-              className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 py-2 rounded uppercase inline-block text-center"
+            <button
+              type="button"
+              onClick={() => navigate("/checkout")}
+              className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 py-2 rounded uppercase"
             >
               ชำระเงิน
-            </Link>
+            </button>
           </div>
         </div>
       </div>
