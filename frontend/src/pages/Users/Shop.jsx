@@ -23,8 +23,18 @@ export default function Shop() {
 
     fetch(url)
       .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("API response is not an array:", data);
+          setProducts([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Fetch products error:", err);
+        setProducts([]);
+      })
       .finally(() => setLoading(false));
   }, [categoryId]); 
 
@@ -34,7 +44,7 @@ export default function Shop() {
   };
 
   if (loading)
-    return <div className="text-white p-6 text-center">กำลังโหลดสินค้า...</div>;
+    return <div className="bg-black min-h-screen text-white p-6 text-center">กำลังโหลดสินค้า...</div>;
 
   return (
     <div className="bg-black min-h-screen text-white p-6">
@@ -71,9 +81,9 @@ export default function Shop() {
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.length === 0 ? (
+        {!Array.isArray(products) || products.length === 0 ? (
           <div className="col-span-full text-center text-neutral-500 py-12">
-            ไม่พบสินค้าในหมวดหมู่นี้
+            ไม่พบสินค้าในระบบ
           </div>
         ) : (
           products.map((item) => (
@@ -115,7 +125,7 @@ export default function Shop() {
                     {item.category_name || "Basketball"}
                   </p>
                   <p className="text-orange-400 font-black text-xl">
-                    ฿{Number(item.price).toLocaleString()}
+                    ฿{Number(item.price || 0).toLocaleString()}
                   </p>
                 </div>
               </div>
