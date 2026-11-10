@@ -9,8 +9,8 @@
 **/dist-ssr/
 
 # Local uploads and logs
-/backend/upload/
-/backend/uploads/
+# /backend/upload/
+# /backend/uploads/
 **/*.log
 
 # Local editor files
